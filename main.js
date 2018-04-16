@@ -13,7 +13,26 @@ crashReporter.start({
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let mainWindow
+let mainWindow = null
+
+function initialize () {
+  const shouldQuit = makeSingleInstance()
+  if (shouldQuit) return app.quit()
+
+  function createWindow () {
+    const windowOptions = {
+      width: 1080,
+      minWidth: 680,
+      height: 840,
+      minHeight: 520,
+      title: app.getName()
+    }
+
+    if (process.platform === 'linux') {
+      windowOptions.icon = path.join(__dirname, '/assets/app-icon/png/512.png')
+    }
+  }
+}
 
 function createWindow() {
   // Create the browser window.
