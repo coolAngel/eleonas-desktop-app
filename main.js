@@ -1,7 +1,7 @@
 const path = require("path")
 const url = require("url")
 const glob = require('glob')
-const { app, BrowserWindow, crashReporter } = require("electron")
+const { app, BrowserWindow, Menu, crashReporter } = require("electron")
 // const autoUpdater = require('./auto-updater')
 
 const debug = /--debug/.test(process.argv[2])
@@ -16,6 +16,7 @@ crashReporter.start({
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow = null
+let authWindow = null
 
 function initialize () {
   const shouldQuit = makeSingleInstance()
@@ -25,11 +26,15 @@ function initialize () {
 
   function createWindow () {
     const windowOptions = {
-      width: 1080,
-      minWidth: 680,
-      height: 840,
-      minHeight: 520,
-      title: app.getName()
+      titleBarStyle: 'hidden',
+      width: 1298,
+      minWidth: 1298,
+      height: 750,
+      minHeight: 600,
+      title: app.getName(),
+      backgroundColor: '#312450',
+      icon: path.join(__dirname, 'assets/app-icon/png/64.png'),
+      show: false
     }
 
     if (process.platform === 'linux') {
@@ -37,15 +42,19 @@ function initialize () {
     }
 
     mainWindow = new BrowserWindow(windowOptions)
+
     // and load the index.html of the app.
     mainWindow.loadURL(
       url.format({
-        pathname: path.join(__dirname, "app", "index.html"),
+        pathname: path.join(__dirname, "index.html"),
         protocol: "file:",
         slashes: true
       })
     )
-
+    
+    if (!debug) {
+      Menu.setApplicationMenu(null)
+    }
     // Launch fullscreen with DevTools open, usage: npm run debug
     if (debug) {
       mainWindow.webContents.openDevTools()
@@ -53,8 +62,18 @@ function initialize () {
       require('devtron').install()
     }
 
+    // show the window when is ready.
+    mainWindow.once('ready-to-show', () => {
+      mainWindow.show()
+    })
+    
+
     mainWindow.on('closed', () => {
       mainWindow = null
+    })
+
+    authWindow.on('closed', () => {
+      authWindow = null
     })
   }
 
@@ -63,6 +82,7 @@ function initialize () {
   // initialization and is ready to create browser windows.
   // Some APIs can only be used after this event occurs.
   app.on("ready", () => {
+    console.log('app is ready. Time to create the main window. \nThe Window will be hidden until the ready-to-show event occurs.')
     createWindow()
     // autoUpdater.initialize()
   })
@@ -80,6 +100,13 @@ function initialize () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (mainWindow === null) { createWindow() }
+  })
+
+  app.on('login', (event, webContents, request, authInfo, callback) => {
+    event.preventDefault()
+
+    console.log('app login event...')
+    callback('username', 'secret')
   })
 }
 
