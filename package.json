@@ -1,0 +1,23 @@
+{
+  "name": "eleonas-desktop-app",
+  "productName": "Eleonas Manager",
+  "version": "0.0.1",
+  "description": "Eleonas Refugee Camp internal application",
+  "appId": "com.github.coolAngel.eleonas-desktop-app",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --debug",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "package:win": "electron-packager . --overwrite --platform=win32 --arch=ia32 --out=out --icon=assets/app-icon/win/app.ico",
+    "package:installer": "node ./script/installer.js"
+  },
+  "author": "coolAngel",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "1.8.4",
+    "electron-packager": "^12.0.1",
+    "electron-winstaller": "^2.6.4",
+    "rimraf": "^2.6.2"
+  }
+}
